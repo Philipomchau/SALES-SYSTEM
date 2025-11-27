@@ -113,7 +113,7 @@ export async function recordSuspiciousActivity(
   severity: "low" | "medium" | "high",
 ): Promise<void> {
   await sql`
-    INSERT INTO suspicious_activities (sale_id, worker_id, reason, severity)
+    INSERT INTO suspicious_activity (sale_id, worker_id, reason, severity)
     VALUES (${saleId}, ${workerId}, ${reason}, ${severity})
   `
 }

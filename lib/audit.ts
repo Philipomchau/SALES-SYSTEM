@@ -8,7 +8,7 @@ export async function logAudit(
   afterData: Record<string, unknown> | null = null,
 ): Promise<void> {
   await sql`
-    INSERT INTO audit_log (worker_id, action_type, sale_id, before_data, after_data)
+    INSERT INTO audit_logs (worker_id, action_type, sale_id, before_data, after_data)
     VALUES (${workerId}, ${actionType}, ${saleId}, ${JSON.stringify(beforeData)}, ${JSON.stringify(afterData)})
   `
 }
