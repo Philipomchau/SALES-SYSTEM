@@ -77,19 +77,24 @@ export async function POST(request: NextRequest) {
     const sale = result[0] as unknown as import("@/lib/db").Sale
 
     // Execute auxiliary tasks in parallel
-    await Promise.all([
-      updatePriceHistory(product_name, unit_price),
-      checkForSuspiciousActivity(sale, worker.id).then(async (suspicions) => {
-        if (suspicions.length > 0) {
-          await Promise.all(
-            suspicions.map((suspicion) =>
-              recordSuspiciousActivity(sale.id, worker.id, suspicion.reason, suspicion.severity),
-            ),
-          )
-        }
-      }),
-      logAudit(worker.id, "CREATE_SALE", sale.id, null, sale),
-    ])
+    // Execute auxiliary tasks in parallel, but don't block/fail the response
+    try {
+      await Promise.all([
+        updatePriceHistory(product_name, unit_price),
+        checkForSuspiciousActivity(sale, worker.id).then(async (suspicions) => {
+          if (suspicions.length > 0) {
+            await Promise.all(
+              suspicions.map((suspicion) =>
+                recordSuspiciousActivity(sale.id, worker.id, suspicion.reason, suspicion.severity),
+              ),
+            )
+          }
+        }),
+        logAudit(worker.id, "CREATE_SALE", sale.id, null, sale),
+      ])
+    } catch (error) {
+      console.error("Auxiliary task error (non-fatal):", error)
+    }
 
     return NextResponse.json(sale, { status: 201 })
   } catch (error) {

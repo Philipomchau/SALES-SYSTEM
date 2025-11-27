@@ -34,7 +34,16 @@ export async function POST(request: NextRequest) {
       RETURNING id, name, email, role, created_at
     `
 
-    await logAudit(admin.id, "CREATE_WORKER", null, null, { name, email, role })
+    try {
+      await logAudit(admin.id, "CREATE_WORKER", null, null, {
+        id: result[0].id,
+        name: result[0].name,
+        email: result[0].email,
+        role: result[0].role,
+      })
+    } catch (error) {
+      console.error("Audit log error (non-fatal):", error)
+    }
 
     return NextResponse.json(result[0], { status: 201 })
   } catch (error: unknown) {
