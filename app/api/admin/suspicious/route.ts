@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
         s.unit_price,
         s.total_amount,
         s.sale_datetime
-      FROM suspicious_activities sa
+      FROM suspicious_activity sa
       LEFT JOIN workers w ON sa.worker_id = w.id
       LEFT JOIN sales s ON sa.sale_id = s.id
     `
@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
     query += ` ORDER BY sa.created_at DESC LIMIT 100`
 
     const result = await sql.query(query)
-    return NextResponse.json(result.rows || result)
+    return NextResponse.json(result)
   } catch (error) {
     console.error("Get suspicious activities error:", error)
     return NextResponse.json({ error: "Failed to fetch suspicious activities" }, { status: 500 })
