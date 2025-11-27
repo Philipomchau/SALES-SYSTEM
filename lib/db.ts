@@ -23,6 +23,8 @@ export type Sale = {
   created_at: string
   updated_at: string
   worker_name?: string
+  unit_type?: "piece" | "kg"
+  client_id?: number | null
 }
 
 export type AuditLog = {

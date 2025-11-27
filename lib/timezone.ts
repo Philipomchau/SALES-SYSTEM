@@ -2,19 +2,20 @@ export const TIMEZONE = "Africa/Dar_es_Salaam"
 
 export function formatDateTime(date: string | Date): string {
   const d = new Date(date)
-  return d.toLocaleString("en-TZ", {
+  return d.toLocaleString("en-GB", {
     timeZone: TIMEZONE,
     year: "numeric",
     month: "short",
     day: "numeric",
     hour: "2-digit",
     minute: "2-digit",
+    hour12: true,
   })
 }
 
 export function formatDate(date: string | Date): string {
   const d = new Date(date)
-  return d.toLocaleDateString("en-TZ", {
+  return d.toLocaleDateString("en-GB", {
     timeZone: TIMEZONE,
     year: "numeric",
     month: "short",
@@ -24,10 +25,11 @@ export function formatDate(date: string | Date): string {
 
 export function formatTime(date: string | Date): string {
   const d = new Date(date)
-  return d.toLocaleTimeString("en-TZ", {
+  return d.toLocaleTimeString("en-GB", {
     timeZone: TIMEZONE,
     hour: "2-digit",
     minute: "2-digit",
+    hour12: true,
   })
 }
 

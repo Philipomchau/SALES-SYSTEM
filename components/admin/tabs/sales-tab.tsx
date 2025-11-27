@@ -139,8 +139,10 @@ export function SalesTab() {
                 <TableHead>Worker</TableHead>
                 <TableHead>Product</TableHead>
                 <TableHead className="text-right">Qty</TableHead>
+                <TableHead>Unit</TableHead>
                 <TableHead className="text-right">Price</TableHead>
                 <TableHead className="text-right">Total</TableHead>
+                <TableHead>Notes</TableHead>
                 <TableHead className="text-center">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -151,11 +153,15 @@ export function SalesTab() {
                   <TableCell>{sale.worker_name}</TableCell>
                   <TableCell>{sale.product_name}</TableCell>
                   <TableCell className="text-right">{sale.quantity}</TableCell>
+                  <TableCell className="capitalize">{sale.unit_type || 'piece'}</TableCell>
                   <TableCell className="text-right">
                     {Number.parseFloat(sale.unit_price.toString()).toLocaleString("en-TZ")}
                   </TableCell>
                   <TableCell className="text-right font-medium text-primary">
                     {Number.parseFloat(sale.total_amount.toString()).toLocaleString("en-TZ")}
+                  </TableCell>
+                  <TableCell className="max-w-[200px] truncate" title={sale.notes || ""}>
+                    {sale.notes || "-"}
                   </TableCell>
                   <TableCell>
                     <div className="flex justify-center gap-2">

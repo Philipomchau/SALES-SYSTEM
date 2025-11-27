@@ -59,17 +59,18 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const worker = await requireAuth()
-    const { product_name, quantity, unit_price, notes } = await request.json()
+    const { product_name, quantity, unit_price, notes, unit_type, client_id, sale_datetime } = await request.json()
 
     if (!product_name || !quantity || !unit_price) {
       return NextResponse.json({ error: "Product name, quantity, and unit price are required" }, { status: 400 })
     }
 
     const total_amount = quantity * unit_price
+    const saleDate = sale_datetime ? new Date(sale_datetime).toISOString() : new Date().toISOString()
 
     const result = await sql`
-      INSERT INTO sales (worker_id, product_name, quantity, unit_price, total_amount, notes)
-      VALUES (${worker.id}, ${product_name}, ${quantity}, ${unit_price}, ${total_amount}, ${notes || null})
+      INSERT INTO sales (worker_id, product_name, quantity, unit_price, total_amount, notes, unit_type, client_id, sale_datetime)
+      VALUES (${worker.id}, ${product_name}, ${quantity}, ${unit_price}, ${total_amount}, ${notes || null}, ${unit_type || 'piece'}, ${client_id || null}, ${saleDate})
       RETURNING *
     `
 

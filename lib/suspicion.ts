@@ -32,6 +32,14 @@ export async function checkForSuspiciousActivity(sale: Sale, workerId: number): 
     })
   }
 
+  // Check: High value transaction
+  if (sale.total_amount > 500000) {
+    suspicions.push({
+      reason: `High value transaction: TZS ${sale.total_amount.toLocaleString()}`,
+      severity: "medium",
+    })
+  }
+
   // Check 2: Unit price is far from typical range
   if (priceHistory.length > 0) {
     const history = priceHistory[0] as PriceHistory

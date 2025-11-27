@@ -1,8 +1,7 @@
 "use client"
 
-import type React from "react"
+import React, { useState } from "react"
 
-import { useState } from "react"
 import { useRouter } from "next/navigation"
 import useSWR from "swr"
 import { Button } from "@/components/ui/button"
@@ -33,9 +32,21 @@ export function WorkerDashboard({ worker }: WorkerDashboardProps) {
   const [quantity, setQuantity] = useState("")
   const [unitPrice, setUnitPrice] = useState("")
   const [notes, setNotes] = useState("")
+  const [unitType, setUnitType] = useState("piece")
+  const [clientId, setClientId] = useState("none")
+  const [saleDate, setSaleDate] = useState("")
   const [submitting, setSubmitting] = useState(false)
   const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle")
   const [submitMessage, setSubmitMessage] = useState("")
+
+  // Initialize date on mount
+  React.useEffect(() => {
+    const now = new Date()
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset())
+    setSaleDate(now.toISOString().slice(0, 16))
+  }, [])
+
+  const { data: clients } = useSWR<any[]>("/api/admin/clients", fetcher)
 
   const getDateRange = () => {
     const now = new Date()
@@ -78,6 +89,9 @@ export function WorkerDashboard({ worker }: WorkerDashboardProps) {
           quantity: Number.parseInt(quantity),
           unit_price: Number.parseFloat(unitPrice),
           notes: notes || null,
+          unit_type: unitType,
+          client_id: clientId === "none" ? null : Number.parseInt(clientId),
+          sale_datetime: new Date(saleDate).toISOString(),
         }),
       })
 
@@ -92,6 +106,12 @@ export function WorkerDashboard({ worker }: WorkerDashboardProps) {
       setQuantity("")
       setUnitPrice("")
       setNotes("")
+      setUnitType("piece")
+      setClientId("none")
+      // Reset date to now
+      const now = new Date()
+      now.setMinutes(now.getMinutes() - now.getTimezoneOffset())
+      setSaleDate(now.toISOString().slice(0, 16))
       mutateSales()
 
       setTimeout(() => setSubmitStatus("idle"), 3000)
@@ -150,11 +170,10 @@ export function WorkerDashboard({ worker }: WorkerDashboardProps) {
                   <form onSubmit={handleSubmit} className="space-y-4">
                     {submitStatus !== "idle" && (
                       <div
-                        className={`flex items-center gap-2 p-3 text-sm ${
-                          submitStatus === "success"
-                            ? "bg-secondary/10 border border-secondary/20 text-secondary"
-                            : "bg-destructive/10 border border-destructive/20 text-destructive"
-                        }`}
+                        className={`flex items-center gap-2 p-3 text-sm ${submitStatus === "success"
+                          ? "bg-secondary/10 border border-secondary/20 text-secondary"
+                          : "bg-destructive/10 border border-destructive/20 text-destructive"
+                          }`}
                       >
                         {submitStatus === "success" ? (
                           <CheckCircle className="h-4 w-4" />
@@ -164,6 +183,35 @@ export function WorkerDashboard({ worker }: WorkerDashboardProps) {
                         {submitMessage}
                       </div>
                     )}
+
+                    <div className="space-y-2">
+                      <Label htmlFor="date">Sale Date</Label>
+                      <Input
+                        id="date"
+                        type="datetime-local"
+                        value={saleDate}
+                        onChange={(e) => setSaleDate(e.target.value)}
+                        required
+                      />
+                      <p className="text-xs text-muted-foreground">Leave as is for "Now", or change for backdated sales.</p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="client">Client (Optional)</Label>
+                      <Select value={clientId} onValueChange={setClientId}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select Client" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">No Client</SelectItem>
+                          {clients?.map((client) => (
+                            <SelectItem key={client.id} value={client.id.toString()}>
+                              {client.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
 
                     <div className="space-y-2">
                       <Label htmlFor="product">Product Name</Label>
@@ -179,15 +227,27 @@ export function WorkerDashboard({ worker }: WorkerDashboardProps) {
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="quantity">Quantity</Label>
-                        <Input
-                          id="quantity"
-                          type="number"
-                          min="1"
-                          value={quantity}
-                          onChange={(e) => setQuantity(e.target.value)}
-                          placeholder="1"
-                          required
-                        />
+                        <div className="flex gap-2">
+                          <Input
+                            id="quantity"
+                            type="number"
+                            min="1"
+                            value={quantity}
+                            onChange={(e) => setQuantity(e.target.value)}
+                            placeholder="1"
+                            required
+                            className="flex-1"
+                          />
+                          <Select value={unitType} onValueChange={setUnitType}>
+                            <SelectTrigger className="w-[100px]">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="piece">Pcs</SelectItem>
+                              <SelectItem value="kg">Kg</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="price">Unit Price (TZS)</Label>

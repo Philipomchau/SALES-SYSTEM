@@ -4,12 +4,14 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { LayoutDashboard, Users, ShoppingCart, AlertTriangle, FileText, LogOut, Download } from "lucide-react"
-import { OverviewTab } from "./tabs/overview-tab"
-import { SalesTab } from "./tabs/sales-tab"
-import { WorkersTab } from "./tabs/workers-tab"
-import { SuspiciousTab } from "./tabs/suspicious-tab"
-import { AuditTab } from "./tabs/audit-tab"
+import { LayoutDashboard, ShoppingCart, Users, BarChart3, LogOut, Settings, UserSquare2, AlertTriangle, FileText, Download } from "lucide-react"
+import { OverviewTab } from "@/components/admin/tabs/overview-tab"
+import { SalesTab } from "@/components/admin/tabs/sales-tab"
+import { WorkersTab } from "@/components/admin/tabs/workers-tab"
+import { ReportsTab } from "@/components/admin/tabs/reports-tab"
+import { SuspiciousTab } from "@/components/admin/tabs/suspicious-tab"
+import { AuditTab } from "@/components/admin/tabs/audit-tab"
+import { ClientsTab } from "@/components/admin/tabs/clients-tab"
 import type { Worker } from "@/lib/db"
 
 interface AdminDashboardProps {
@@ -68,6 +70,14 @@ export function AdminDashboard({ admin }: AdminDashboardProps) {
               <Users className="h-4 w-4" />
               Workers
             </TabsTrigger>
+            <TabsTrigger value="clients" className="gap-2">
+              <UserSquare2 className="h-4 w-4" />
+              Clients
+            </TabsTrigger>
+            <TabsTrigger value="reports" className="gap-2">
+              <BarChart3 className="h-4 w-4" />
+              Reports
+            </TabsTrigger>
             <TabsTrigger value="suspicious" className="gap-2">
               <AlertTriangle className="h-4 w-4" />
               Suspicious
@@ -88,6 +98,14 @@ export function AdminDashboard({ admin }: AdminDashboardProps) {
 
           <TabsContent value="workers">
             <WorkersTab />
+          </TabsContent>
+
+          <TabsContent value="clients">
+            <ClientsTab />
+          </TabsContent>
+
+          <TabsContent value="reports">
+            <ReportsTab />
           </TabsContent>
 
           <TabsContent value="suspicious">
